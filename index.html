@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📨 Portfolio Messages - Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            max-width: 1200px;
+            margin: 0 auto 2rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #00ff88, #00ffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1rem 0;
+        }
+
+        .stat-box {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            padding: 1rem 2rem;
+            border-radius: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #00ff88;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #00ff88;
+            font-size: 1.2rem;
+        }
+
+        .messages-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .message {
+            background: linear-gradient(135deg, #111 0%, #181818 100%);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            transition: all 0.3s;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message:hover {
+            border-color: #00ff88;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .message h3 {
+            color: #00ff88;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .message-time {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .message-info {
+            margin: 0.8rem 0;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: rgba(0, 255, 136, 0.05);
+            border-radius: 6px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #00ffff;
+            min-width: 60px;
+        }
+
+        .info-value {
+            color: #fff;
+        }
+
+        .message-text {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 3px solid #00ff88;
+            margin-top: 1rem;
+            line-height: 1.6;
+        }
+
+        .no-messages {
+            text-align: center;
+            padding: 3rem;
+            color: #888;
+            font-size: 1.1rem;
+        }
+
+        .refresh-btn {
+            background: #00ff88;
+            color: #0a0a0a;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 1rem auto;
+            display: block;
+        }
+
+        .refresh-btn:hover {
+            background: #00ffff;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .message {
+                padding: 1rem;
+            }
+
+            .message-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .info-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>📨 Portfolio Contact Messages</h1>
+    <p style="color: #888; margin-top: 0.5rem;">Real-time message dashboard</p>
+
+    <div class="stats">
+        <div class="stat-box">
+            <div class="stat-label">Total Messages</div>
+            <div class="stat-value" id="totalMessages">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Today</div>
+            <div class="stat-value" id="todayMessages">0</div>
+        </div>
+    </div>
+
+    <button class="refresh-btn" onclick="location.reload()">🔄 Refresh</button>
+</div>
+
+<div id="loading" class="loading">
+    Loading messages... ⏳
+</div>
+
+<div id="messagesContainer" class="messages-container" style="display: none;">
+    <!-- Messages will be loaded here -->
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<script>
+    // 🔥 તમારો same Firebase configuration અહીં paste કરો
+    const firebaseConfig = {
+        apiKey: "AIzaSyCakUVkQtUNIPxdVBLDWHNB_kznSsbokzM",
+        authDomain: "harikesh-portfolio-7b8b2.firebaseapp.com",
+        projectId: "harikesh-portfolio-7b8b2",
+        storageBucket: "harikesh-portfolio-7b8b2.firebasestorage.app",
+        messagingSenderId: "723820823962",
+        appId: "1:723820823962:web:6668531dc644b9b1a12623",
+        measurementId: "G-4E45500NE8"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Load messages in real-time
+    db.collection('messages')
+        .orderBy('timestamp', 'desc')
+        .onSnapshot((snapshot) => {
+            const messagesContainer = document.getElementById('messagesContainer');
+            const loading = document.getElementById('loading');
+
+            loading.style.display = 'none';
+            messagesContainer.style.display = 'block';
+
+            if (snapshot.empty) {
+                messagesContainer.innerHTML = '<div class="no-messages">📭 No messages yet</div>';
+                document.getElementById('totalMessages').textContent = '0';
+                document.getElementById('todayMessages').textContent = '0';
+                return;
+            }
+
+            let totalCount = 0;
+            let todayCount = 0;
+            const today = new Date().toDateString();
+
+            messagesContainer.innerHTML = '';
+
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                totalCount++;
+
+                // Check if message is from today
+                if (data.timestamp) {
+                    const msgDate = data.timestamp.toDate().toDateString();
+                    if (msgDate === today) todayCount++;
+                }
+
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message';
+                messageDiv.innerHTML = `
+                      <div class="message-header">
+                          <h3>👤 ${data.name}</h3>
+                          <span class="message-time">${data.date || 'Date not available'}</span>
+                      </div>
+
+                      <div class="message-info">
+                          <div class="info-row">
+                              <span class="info-label">📧 Email:</span>
+                              <span class="info-value">${data.email}</span>
+                          </div>
+                      </div>
+
+                      <div class="message-text">
+                          <strong style="color: #00ffff; display: block; margin-bottom: 0.5rem;">💬 Message:</strong>
+                          ${data.message}
+                      </div>
+                  `;
+
+                messagesContainer.appendChild(messageDiv);
+            });
+
+            // Update stats
+            document.getElementById('totalMessages').textContent = totalCount;
+            document.getElementById('todayMessages').textContent = todayCount;
+        }, (error) => {
+            console.error('Error loading messages:', error);
+            document.getElementById('loading').innerHTML = '❌ Error loading messages. Check console for details.';
+        });
+</script>
+</body>
+</html>
