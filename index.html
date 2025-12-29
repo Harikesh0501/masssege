@@ -178,6 +178,100 @@
             transform: scale(1.05);
         }
 
+        .reply-btn {
+            background: linear-gradient(135deg, #00ff88, #00ffff);
+            color: #0a0a0a;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .reply-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .call-btn {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #0a0a0a;
+            border: none;
+            padding: 0.7rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .call-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+        }
+
+        .whatsapp-btn {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            border: none;
+            padding: 0.7rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .whatsapp-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4);
+        }
+
+        .email-btn {
+            background: linear-gradient(135deg, #00ffff, #00cccc);
+            color: #0a0a0a;
+            border: none;
+            padding: 0.7rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .email-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.4);
+        }
+
+        .sms-btn {
+            background: linear-gradient(135deg, #ff00ff, #cc00cc);
+            color: white;
+            border: none;
+            padding: 0.7rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .sms-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 0, 255, 0.4);
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -205,6 +299,10 @@
             .info-row {
                 flex-direction: column;
                 align-items: flex-start;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -241,7 +339,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
 <script>
-    // 🔥 તમારો same Firebase configuration અહીં paste કરો
+    // 🔥 Firebase configuration
     const firebaseConfig = {
         apiKey: "AIzaSyCakUVkQtUNIPxdVBLDWHNB_kznSsbokzM",
         authDomain: "harikesh-portfolio-7b8b2.firebaseapp.com",
@@ -302,11 +400,34 @@
                               <span class="info-label">📧 Email:</span>
                               <span class="info-value">${data.email}</span>
                           </div>
+                          ${data.phone ? `
+                          <div class="info-row">
+                              <span class="info-label">📱 Phone:</span>
+                              <span class="info-value">${data.phone}</span>
+                          </div>
+                          ` : ''}
                       </div>
 
                       <div class="message-text">
                           <strong style="color: #00ffff; display: block; margin-bottom: 0.5rem;">💬 Message:</strong>
                           ${data.message}
+                      </div>
+
+                      <div class="action-buttons">
+                          <button class="email-btn" onclick="replyToEmail('${data.email}', '${data.name}')">
+                              📧 Email
+                          </button>
+                          ${data.phone ? `
+                          <button class="sms-btn" onclick="sendSMS('${data.phone}', '${data.name}', \`${data.message.replace(/`/g, '\\`').replace(/\n/g, '\\n')}\`)">
+                              💬 SMS
+                          </button>
+                          <button class="call-btn" onclick="callNumber('${data.phone}')">
+                              📞 Call
+                          </button>
+                          <button class="whatsapp-btn" onclick="sendWhatsApp('${data.phone}', '${data.name}', \`${data.message.replace(/`/g, '\\`').replace(/\n/g, '\\n')}\`)">
+                              💚 WhatsApp
+                          </button>
+                          ` : ''}
                       </div>
                   `;
 
@@ -320,6 +441,45 @@
             console.error('Error loading messages:', error);
             document.getElementById('loading').innerHTML = '❌ Error loading messages. Check console for details.';
         });
+
+    // Function to reply via email using Gmail Web
+    function replyToEmail(email, name) {
+        const subject = encodeURIComponent('Re: Your message from Portfolio');
+        const body = encodeURIComponent(`Hi ${name},\n\nThank you for reaching out to me!\n\nBest regards,\nHarikesh Patel`);
+        
+        // Open Gmail compose in new tab
+        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${subject}&body=${body}`;
+        window.open(gmailUrl, '_blank');
+    }
+
+    // Function to call phone number
+    function callNumber(phone) {
+        window.location.href = `tel:${phone}`;
+    }
+
+    // Function to send SMS message
+    function sendSMS(phone, name, originalMessage) {
+        const smsText = `Hi ${name}, Thank you for contacting me. Regarding your message: "${originalMessage}" - I'd be happy to help. Best regards, Harikesh Patel`;
+        const message = encodeURIComponent(smsText);
+        
+        // SMS URL (works on both mobile and desktop)
+        window.location.href = `sms:${phone}?body=${message}`;
+    }
+
+    // Function to send WhatsApp message
+    function sendWhatsApp(phone, name, originalMessage) {
+        // Remove any spaces or special characters from phone number
+        const cleanPhone = phone.replace(/\D/g, '');
+        
+        // Create reply message with original message included
+        const replyText = `Hi ${name},\n\nThank you for contacting me through my portfolio.\n\n*Your message:*\n"${originalMessage}"\n\nI'd be happy to help you with this. Let me know how I can assist you further.\n\nBest regards,\nHarikesh Patel`;
+        
+        const message = encodeURIComponent(replyText);
+        
+        // WhatsApp URL
+        const whatsappUrl = `https://wa.me/${cleanPhone}?text=${message}`;
+        window.open(whatsappUrl, '_blank');
+    }
 </script>
 </body>
 </html>
